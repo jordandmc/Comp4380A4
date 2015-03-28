@@ -1,6 +1,6 @@
 # Comp4380A4
 ## Q1 - B+ Tree Simulator
-usage: python "degree" "path/to/test-file"
+usage: python A4Q1.py "degree" "path/to/test-file"
 
 example: python A4Q1.py 1 test1.txt
 
