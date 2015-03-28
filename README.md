@@ -4,7 +4,7 @@ usage: python "degree" "path/to/test-file"
 
 example: python 1 test1.txt
 
-example" python 5 "Other Test Files/testadd.txt"
+example: python 5 "Other Test Files/testadd.txt"
 
 ## Q2
 
