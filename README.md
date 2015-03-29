@@ -7,14 +7,17 @@ Jordan Cole
 
 ## Q1 - B+ Tree Simulator
 usage: python A4Q1.py "degree" "path/to/test-file"  
-example: python A4Q1.py 1 test1.txt  
-example: python A4Q1.py 5 "Other Test Files/testadd.txt"
+how-to-run:  
+python A4Q1.py 1 test1.txt  
+python A4Q1.py 5 "Other Test Files/testadd.txt"
 
-## Q2
-usage: javac A4Q1.java  
+## Q2 - External Sorting
 usage: java A4Q1 pageSize numOfBuffPages fileToReadFrom fileToWriteTo  
-example: java A4Q1 2 3 SIDs.txt SortedSIDs.txt  
+how-to-run:  
+javac A4Q1.java  
+java A4Q1 2 3 SIDs.txt SortedSIDs.txt  
 
-## Q3
-usage: javac A4Q3.java  
-usage: java A4Q3 Students.txt Enrolled.txt Q3aux.txt  
+## Q3 - Natural Join
+how-to-run:  
+javac A4Q3.java  
+java A4Q3 Students.txt Enrolled.txt Q3aux.txt  
