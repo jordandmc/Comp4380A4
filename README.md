@@ -11,7 +11,7 @@ example: python A4Q1.py 1 test1.txt
 example: python A4Q1.py 5 "Other Test Files/testadd.txt"
 
 ## Q2
-usage: javac A4Q1.java
+usage: javac A4Q1.java  
 usage: java A4Q1 pageSize numOfBuffPages fileToReadFrom fileToWriteTo  
 example: java A4Q1 2 3 SIDs.txt SortedSIDs.txt  
 
