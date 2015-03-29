@@ -114,7 +114,7 @@ class BPlusTree:
                 tree_string += " ]  "
 
                 for data in node.data:
-                    queue.append([data, height])
+                    queue.append([data, height + 1])
 
         print(tree_string)
 
