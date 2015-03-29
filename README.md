@@ -16,3 +16,5 @@ usage: java A4Q1 pageSize numOfBuffPages fileToReadFrom fileToWriteTo
 example: java A4Q1 2 3 SIDs.txt SortedSIDs.txt  
 
 ## Q3
+usage: javac A4Q3.java  
+usage: java A4Q3 Students.txt Enrolled.txt Q3aux.txt  
