@@ -7,21 +7,32 @@ import java.util.List;
 public class A4Q2 {
 	public static void main(String[] args) throws IOException {
 		List<Integer> sIDs = new ArrayList<Integer>();
-		String fileName = "SIDs.txt";
+		String fileNameToRead = null;
+		String fileNameToWrite = null;
+		String pageSize = null;
+		String buffPages = null;
+		if(args.length > 0){
+
+			pageSize = args[0];
+			buffPages = args[1];
+			
+			fileNameToRead = args[2];
+			fileNameToWrite = args[3];
+		}
 
 
-		sIDs  = readFile(fileName);
-		mergeSort(sIDs);
+		sIDs  = readFile(fileNameToRead);
+		mergeSort(sIDs, fileNameToWrite,pageSize,buffPages);
 
 
 
 	}// main
-	private static void  mergeSort(List<Integer> ListToSort){
+	private static void  mergeSort(List<Integer> ListToSort, String fileName, String pageSize, String buffPages) throws IOException{
 		List<Integer> subListToSort = new ArrayList<Integer>();
 		List<List<Integer>> listOLists = new ArrayList<List<Integer>>();
-
-		double numOfBuffPgs = 3;
-		double pgSize = 2;
+		
+		double pgSize =  Double.parseDouble(pageSize);
+		double numOfBuffPgs =  Double.parseDouble(buffPages);
 		double numOfsIDs = 0;
 		double sIDsToRead = 0;
 		double numOfPgs = 0;
@@ -58,7 +69,7 @@ public class A4Q2 {
 				}
 
 			}else{
-				
+
 				for(int j = 0; j < listOLists.size();){
 					System.out.print("Read ");
 					subListToSort = new ArrayList<Integer>();
@@ -76,9 +87,17 @@ public class A4Q2 {
 
 				}
 			}
-
 			System.out.println();
 		}
+		FileWriter fw = new FileWriter(fileName,false);
+		BufferedWriter bw = new BufferedWriter(fw);
+		subListToSort = listOLists.get(0);
+		for (int k = 0; k < subListToSort.size(); k++){
+			bw.write(subListToSort.get(k).toString());
+			bw.newLine();
+
+		}
+		bw.close();
 
 
 	}
