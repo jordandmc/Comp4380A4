@@ -33,11 +33,11 @@ def parse_input(file_name):
 
 
 class Node:
-    def __init__(self):
-        self.keys = []  # Contains the values in index/leaf nodes
-        self.data = []  # Points to nodes below this one
-        self.parent = None
-        self.isLeaf = False
+    def __init__(self, keys=[], children=[], parent=None, is_leaf=None):
+        self.keys = keys  # Contains the values in index/leaf nodes
+        self.children = children  # Points to nodes below this one
+        self.parent = parent
+        self.is_leaf = is_leaf
 
 
 class BPlusTree:
@@ -47,40 +47,38 @@ class BPlusTree:
         self.print_num = 0
 
     def search(self, value):
-        print("\tsearching...")
+        print("    searching...")
         return self.recursive_search(self.root, value)
 
     def recursive_search(self, node, value):
         if node is None: # Empty Tree
             return None
-        elif node.isLeaf:
+        elif node.is_leaf:
             return node  # Found the leaf node the value could be in, return this node
         else:
             for index, key in node.keys:
                 if value < key:
-                    return recursive_search(self, data[index], value)  # Search left
+                    return recursive_search(self, node.children[index], value)  # Search left
 
             # Bigger than every key in index, Go down the far right
-            return recursive_search(self, data[len(data)-1], value)
+            return recursive_search(self, node.children[len(node.children)-1], value)
 
-    def insert(self, data):
-        print("insert " + data)
-        node = self.search(data)
+    def insert(self, value):
+        print("insert " + value)
+        node = self.search(value)
         if node is None:
-            print("\tnode is none, creating root")
-            self.root = Node()
-            self.root.keys.append(data)
-            self.root.isLeaf = True
-        elif root == node:
-            print("the root is still a leaf node")
+            print("    node is none, creating root")
+            self.root = Node(keys=[value], is_leaf=True)
+        elif self.root == node:
+            print("    the root is still a leaf node")
         else:
-            print("\tinsert data and propagate the changes up")
+            print("    insert data and propagate the changes up")
 
     def split(self):
         print("split")
 
-    def delete(self, data):
-        print("delete " + data)
+    def delete(self, value):
+        print("delete " + value)
 
     def merge(self):
         print("merge")
@@ -109,12 +107,12 @@ class BPlusTree:
                 tree_string += "["
                 for key in node.keys:
                     tree_string += " " + key
-                    if node.isLeaf:
+                    if node.is_leaf:
                         tree_string += "*"
                 tree_string += " ]  "
 
-                for data in node.data:
-                    queue.append([data, height + 1])
+                for child in node.children:
+                    queue.append([child, height + 1])
 
         print(tree_string)
 
