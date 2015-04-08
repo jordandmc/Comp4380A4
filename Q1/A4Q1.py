@@ -75,13 +75,13 @@ class BPlusTree:
             self.root = Node(keys=[value], is_leaf=True)
             self.root.evaluate_vacancy
         elif node.is_full:
-            node.split
+            self.split(node)
         else:
             node.keys.append(value)
             node.keys.sort
             node.evaluate_vacancy
 
-    def split(self):
+    def split(self, node):
         print("split")
 
     def delete(self, value):
