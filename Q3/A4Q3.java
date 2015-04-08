@@ -43,7 +43,6 @@ public class A4Q3
             {
                 split = line.split("\\s+");
                 
-                
                 table.add(new ArrayList<String>());
                 
                 for(int i = 0; i < split.length; i++)
@@ -125,10 +124,6 @@ public class A4Q3
     
     public static ArrayList<ArrayList<String>> joinTables(ArrayList<ArrayList<String>> studTable, ArrayList<ArrayList<String>> enrldTable)
     {
-      int startStud = 0;
-      int startEnrld = 0;
-      int endStud = studPgSize;
-      int endEnrld = enrldPgSize;
       String enrldId = "";
       String studId = "";
       ArrayList<ArrayList<String>> joinTable = new ArrayList<ArrayList<String>>();
