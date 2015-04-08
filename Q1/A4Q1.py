@@ -62,7 +62,8 @@ class BPlusTree:
             return node  # Found the leaf node the value could be in, return this node
         else:
             for index, key in enumerate(node.keys):
-                if value < key:
+                temp = (value < key)
+                if temp:
                     return self.recursive_search(node.children[index], value)  # Search left
                 else:
                     print(value, "is greater than ", key)
