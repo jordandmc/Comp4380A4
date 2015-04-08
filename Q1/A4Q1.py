@@ -61,12 +61,14 @@ class BPlusTree:
         elif node.is_leaf:
             return node  # Found the leaf node the value could be in, return this node
         else:
-            for index, key in node.keys:
+            for index, key in enumerate(node.keys):
                 if value < key:
-                    return recursive_search(self, node.children[index], value)  # Search left
+                    return self.recursive_search(node.children[index], value)  # Search left
+                else:
+                    print(value, "is greater than ", key)
 
             # Bigger than every key in index, Go down the far right
-            return recursive_search(self, node.children[len(node.children)-1], value)
+            return self.recursive_search(node.children[len(node.children)-1], value)
     
     def insert(self, value):
         print("insert " + value)
