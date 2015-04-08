@@ -31,13 +31,17 @@ def parse_input(file_name):
         instructions = input_file.readlines()
     return instructions
 
-
 class Node:
     def __init__(self, keys=[], children=[], parent=None, is_leaf=None):
         self.keys = keys  # Contains the values in index/leaf nodes
         self.children = children  # Points to nodes below this one
         self.parent = parent
         self.is_leaf = is_leaf
+        self.is_full = False
+
+    def evaluate_vacancy(self):
+        if(not(degree < self.keys.count)):
+            self.is_full = True
 
 
 class BPlusTree:
@@ -69,10 +73,13 @@ class BPlusTree:
         if node is None:
             print("    node is none, creating root")
             self.root = Node(keys=[value], is_leaf=True)
-        elif self.root == node:
-            print("    the root is still a leaf node")
+            self.root.evaluate_vacancy
+        elif node.is_full:
+            node.split
         else:
-            print("    insert data and propagate the changes up")
+            node.keys.append(value)
+            node.keys.sort
+            node.evaluate_vacancy
 
     def split(self):
         print("split")
