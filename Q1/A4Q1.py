@@ -1,5 +1,6 @@
 import sys
 import os
+import math
 from collections import deque
 
 def main():
@@ -37,19 +38,19 @@ class Node:
         self.children = children  # Points to nodes below this one
         self.parent = parent
         self.is_leaf = is_leaf
-        self.is_full = False
-
-    def evaluate_vacancy(self):
-        if(not(degree < self.keys.count)):
-            self.is_full = True
-
+        self.has_vacancy = True
 
 class BPlusTree:
     def __init__(self, degree):
         self.root = None
         self.degree = degree
         self.print_num = 0
-
+    
+    def evaluate_vacancy(self, node):
+        print(len(node.keys))
+        if self.degree+1 < len(node.keys):
+            node.has_vacancy = False
+    
     def search(self, value):
         print("    searching...")
         return self.recursive_search(self.root, value)
@@ -66,23 +67,35 @@ class BPlusTree:
 
             # Bigger than every key in index, Go down the far right
             return recursive_search(self, node.children[len(node.children)-1], value)
-
+    
     def insert(self, value):
         print("insert " + value)
         node = self.search(value)
         if node is None:
             print("    node is none, creating root")
             self.root = Node(keys=[value], is_leaf=True)
-            self.root.evaluate_vacancy
-        elif node.is_full:
-            self.split(node)
+            #self.evaluate_vacancy(node)
         else:
             node.keys.append(value)
-            node.keys.sort
-            node.evaluate_vacancy
+            node.keys.sort()
+            self.evaluate_vacancy(node)
+            if not node.has_vacancy:
+                self.split(node)
 
     def split(self, node):
         print("split")
+        if not self.root.has_vacancy:
+            half = math.floor(len(node.keys)/2)
+            left_child = Node(keys=node.keys[0:half], parent=node, is_leaf=True)
+            right_child = Node(keys=node.keys[half:len(node.keys)], parent=node, is_leaf=True)
+            node.keys.clear()
+            node.keys.append(right_child.keys[0])
+            node.has_vacancy = True
+            node.is_leaf = False
+            node.children.append(left_child)
+            left_child.children = [] #revert unintended modification
+            node.children.append(right_child)
+            right_child.children = [] #revert unintended modification
 
     def delete(self, value):
         print("delete " + value)
