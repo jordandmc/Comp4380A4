@@ -20,7 +20,7 @@ def main():
             op, value = operation.split()
             
             if op.upper() == "INSERT":
-                tree.insert(value)
+                tree.insert(int(value))
             elif op.upper() == "DELETE":
                 tree.delete(value)
             elif op.upper() == "PRINT":
@@ -47,7 +47,6 @@ class BPlusTree:
         self.print_num = 0
     
     def evaluate_vacancy(self, node):
-        print(len(node.keys))
         if self.degree+1 < len(node.keys):
             node.has_vacancy = False
     
@@ -62,22 +61,18 @@ class BPlusTree:
             return node  # Found the leaf node the value could be in, return this node
         else:
             for index, key in enumerate(node.keys):
-                temp = (value < key)
-                if temp:
+                if value < key:
                     return self.recursive_search(node.children[index], value)  # Search left
-                else:
-                    print(value, "is greater than ", key)
 
             # Bigger than every key in index, Go down the far right
             return self.recursive_search(node.children[len(node.children)-1], value)
     
     def insert(self, value):
-        print("insert " + value)
+        print("insert " + str(value))
         node = self.search(value)
         if node is None:
             print("    node is none, creating root")
             self.root = Node(keys=[value], is_leaf=True)
-            #self.evaluate_vacancy(node)
         else:
             node.keys.append(value)
             node.keys.sort()
@@ -87,18 +82,26 @@ class BPlusTree:
 
     def split(self, node):
         print("split")
-        if not self.root.has_vacancy:
+        if not node.has_vacancy:
             half = math.floor(len(node.keys)/2)
-            left_child = Node(keys=node.keys[0:half], parent=node, is_leaf=True)
-            right_child = Node(keys=node.keys[half:len(node.keys)], parent=node, is_leaf=True)
-            node.keys.clear()
-            node.keys.append(right_child.keys[0])
-            node.has_vacancy = True
-            node.is_leaf = False
-            node.children.append(left_child)
-            left_child.children = [] #revert unintended modification
-            node.children.append(right_child)
-            right_child.children = [] #revert unintended modification
+            
+            if node.is_leaf:
+                left_child = Node(keys=node.keys[0:half], is_leaf=True)
+                right_child = Node(keys=node.keys[half:len(node.keys)], is_leaf=True)
+                parent = node.parent
+                if parent is None:
+                    parent = Node(keys=[right_child.keys[0]], children=[left_child, right_child], is_leaf=False)
+                    self.root = parent
+                elif parent.has_vacancy:
+                    parent.keys.append(right_child.keys[0])
+                    parent.children.remove(node)
+                    parent.children.append(left_child)
+                    parent.children.append(right_child)
+                else:
+                    print("parent full")
+                    #self.split(parent)
+                left_child.parent = parent
+                right_child.parent = parent
 
     def delete(self, value):
         print("delete " + value)
@@ -123,13 +126,13 @@ class BPlusTree:
             queue_entry = queue.popleft()
             node, node_height = queue_entry[0], queue_entry[1]
             if height != node_height:
-                print("\n")
+                tree_string += "\n"
                 height += 1
 
             if node is not None:
                 tree_string += "["
                 for key in node.keys:
-                    tree_string += " " + key
+                    tree_string += " " + str(key)
                     if node.is_leaf:
                         tree_string += "*"
                 tree_string += " ]  "
