@@ -1,5 +1,6 @@
 import sys
 import os
+import math
 from collections import deque
 
 def main():
@@ -30,21 +31,24 @@ def parse_input(file_name):
         instructions = input_file.readlines()
     return instructions
 
-
 class Node:
     def __init__(self, keys=[], children=[], parent=None, is_leaf=None):
         self.keys = keys  # Contains the values in index/leaf nodes
         self.children = children  # Points to nodes below this one
         self.parent = parent
         self.is_leaf = is_leaf
-
+        self.has_vacancy = True
 
 class BPlusTree:
     def __init__(self, degree):
         self.root = None
         self.degree = degree
         self.print_num = 0
-
+    
+    def evaluate_vacancy(self, node):
+        if self.degree+1 < len(node.keys):
+            node.has_vacancy = False
+    
     def search(self, value):
         print("    searching...")
         return self.recursive_search(self.root, value)
@@ -61,20 +65,42 @@ class BPlusTree:
 
             # Bigger than every key in index, Go down the far right
             return self.recursive_search(node.children[len(node.children)-1], value)
-
+    
     def insert(self, value):
-        print("insert " + value)
+        print("insert " + str(value))
         node = self.search(value)
         if node is None:
             print("    node is none, creating root")
             self.root = Node(keys=[value], is_leaf=True)
-        elif self.root == node:
-            print("    the root is still a leaf node")
         else:
-            print("    insert data and propagate the changes up")
+            node.keys.append(value)
+            node.keys.sort()
+            self.evaluate_vacancy(node)
+            if not node.has_vacancy:
+                self.split(node)
 
-    def split(self):
+    def split(self, node):
         print("split")
+        if not node.has_vacancy:
+            half = math.floor(len(node.keys)/2)
+            
+            if node.is_leaf:
+                left_child = Node(keys=node.keys[0:half], is_leaf=True)
+                right_child = Node(keys=node.keys[half:len(node.keys)], is_leaf=True)
+                parent = node.parent
+                if parent is None:
+                    parent = Node(keys=[right_child.keys[0]], children=[left_child, right_child], is_leaf=False)
+                    self.root = parent
+                elif parent.has_vacancy:
+                    parent.keys.append(right_child.keys[0])
+                    parent.children.remove(node)
+                    parent.children.append(left_child)
+                    parent.children.append(right_child)
+                else:
+                    print("parent full")
+                    #self.split(parent)
+                left_child.parent = parent
+                right_child.parent = parent
 
     def delete(self, value):
         print("delete " + str(value))
@@ -176,13 +202,6 @@ class BPlusTree:
             
             node.keys.sort()
 
-    def merge(self):
-                self.root = node
-
-            parent.children.remove(right_sibling)
-            self.delete_recursive(parent, parent.keys[node_position])
-            return
-
     def print_tree(self):
         print("B+tree #" + str(self.print_num) + " with order d=" + str(self.degree))
         self.print_num += 1
@@ -200,6 +219,7 @@ class BPlusTree:
             queue_entry = queue.popleft()
             node, node_height = queue_entry[0], queue_entry[1]
             if height != node_height:
+
                 tree_string += "\n"
                 height += 1
 
@@ -207,6 +227,7 @@ class BPlusTree:
                 
                 tree_string += "["
                 for key in node.keys:
+
                     tree_string += " " + str(key)
                     if node.is_leaf:
                         tree_string += "*"
