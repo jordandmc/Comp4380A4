@@ -242,14 +242,12 @@ class BPlusTree:
             queue_entry = queue.popleft()
             node, node_height = queue_entry[0], queue_entry[1]
             if height != node_height:
-
                 tree_string += "\n"
                 height += 1
 
             if node is not None:
                 tree_string += "["
                 for key in node.keys:
-
                     tree_string += " " + str(key)
                     if node.is_leaf:
                         tree_string += "*"
