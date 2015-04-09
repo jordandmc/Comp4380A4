@@ -118,7 +118,7 @@ public class A4Q3
                          " pages.");
       System.out.println("The common columns are Column 1 in Students.txt and Column 1 in Enrolled.txt.");
       
-      System.out.println("These records are joined using the Simple Nested Loop Join with B=" +
+      System.out.println("These records are joined using the Page-oriented Nested Loop Join with B=" +
                          numBuff + " pages.");
     }
     
