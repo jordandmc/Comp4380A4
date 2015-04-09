@@ -20,9 +20,9 @@ def main():
             op, value = operation.split()
             
             if op.upper() == "INSERT":
-                tree.insert(value)
+                tree.insert(int(value))
             elif op.upper() == "DELETE":
-                tree.delete(value)
+                tree.delete(int(value))
             elif op.upper() == "PRINT":
                 tree.print_tree()
 
@@ -46,11 +46,10 @@ class BPlusTree:
         self.print_num = 0
     
     def evaluate_vacancy(self, node):
-        if self.degree+1 < len(node.keys):
+        if self.degree + 1 < len(node.keys):
             node.has_vacancy = False
     
     def search(self, value):
-        print("    searching...")
         return self.recursive_search(self.root, value)
 
     def recursive_search(self, node, value):
@@ -67,28 +66,28 @@ class BPlusTree:
             return self.recursive_search(node.children[len(node.children)-1], value)
     
     def insert(self, value):
-        print("insert " + str(value))
+        print("insert", value)
         node = self.search(value)
         if node is None:
-            print("    node is none, creating root")
             self.root = Node(keys=[value], is_leaf=True)
         else:
             node.keys.append(value)
             node.keys.sort()
             self.evaluate_vacancy(node)
+
             if not node.has_vacancy:
                 self.split(node)
 
     def split(self, node):
-        print("split")
         if not node.has_vacancy:
             half = math.floor(len(node.keys)/2)
-            
             left_child = Node(keys=node.keys[0:half], is_leaf=node.is_leaf)
             right_child = Node(keys=node.keys[half:len(node.keys)], is_leaf=node.is_leaf)
             parent = node.parent
+
             if parent is None:
                 parent = Node(keys=[right_child.keys[0]], children=[left_child, right_child], is_leaf=False)
+                
                 if not node.is_leaf:
                     right_child.keys.remove(right_child.keys[0])
                 self.root = parent
@@ -98,27 +97,31 @@ class BPlusTree:
                 parent.children.append(left_child)
                 parent.children.append(right_child)
                 self.evaluate_vacancy(parent)
+
                 if not parent.has_vacancy:
                     self.split(parent)
+
             if parent.has_vacancy:
                 left_child.parent = parent
                 right_child.parent = parent
+
             if not node.is_leaf:
                 length = len(node.children)
                 majority = math.ceil(length/2)
                 left_child.children.extend(node.children[0:majority])
+
                 for child in left_child.children:
                     child.parent = left_child
                     child.children = [] #weird fix
                 right_child.children = [] #fix for weirdness of being linked to left_child.children
                 right_child.children.extend(node.children[majority:length])
+
                 for child in right_child.children:
                     child.parent = right_child
                     child.children = [] #weird fix
 
     def delete(self, value):
-        print("delete " + str(value))
-
+        print("delete", value)
         node = self.search(value)
         self.delete_recursive(node, value)
 
@@ -138,7 +141,6 @@ class BPlusTree:
 
     def borrow(self, node):
         parent = node.parent
-                    
         node_position = parent.children.index(node)
 
         if node_position > 0:
@@ -184,9 +186,9 @@ class BPlusTree:
         if len(node.keys) >= self.degree:
             return
         if node_position > 0:
-            print("reached merge")
             left_sibling = parent.children[node_position - 1]
             node.keys.extend(left_sibling.keys)
+
             if not node.is_leaf:
                 node.keys.append(parent.keys[node_position - 1])
                 left_sibling.children.extend(node.children) #puts children in correct order
@@ -205,9 +207,9 @@ class BPlusTree:
             return
 
         if node_position < len(parent.children) - 1:
-            print("reached merge")
             right_sibling = parent.children[node_position + 1]
             node.keys.extend(right_sibling.keys)
+
             if not node.is_leaf:
                 node.keys.append(parent.keys[node_position])
                 node.children.extend(right_sibling.children)
