@@ -101,6 +101,9 @@ class BPlusTree:
             parent.children.append(right_child)
             self.evaluate_vacancy(parent)
 
+            if not node.is_leaf:
+                right_child.keys.remove(right_child.keys[0])
+
             if not parent.has_vacancy:
                 self.split(parent)
 
