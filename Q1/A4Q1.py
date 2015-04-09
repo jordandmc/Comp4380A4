@@ -85,23 +85,37 @@ class BPlusTree:
         if not node.has_vacancy:
             half = math.floor(len(node.keys)/2)
             
-            if node.is_leaf:
-                left_child = Node(keys=node.keys[0:half], is_leaf=True)
-                right_child = Node(keys=node.keys[half:len(node.keys)], is_leaf=True)
-                parent = node.parent
-                if parent is None:
-                    parent = Node(keys=[right_child.keys[0]], children=[left_child, right_child], is_leaf=False)
-                    self.root = parent
-                elif parent.has_vacancy:
-                    parent.keys.append(right_child.keys[0])
-                    parent.children.remove(node)
-                    parent.children.append(left_child)
-                    parent.children.append(right_child)
-                else:
-                    print("parent full")
-                    #self.split(parent)
+            left_child = Node(keys=node.keys[0:half], is_leaf=node.is_leaf)
+            right_child = Node(keys=node.keys[half:len(node.keys)], is_leaf=node.is_leaf)
+            parent = node.parent
+            if parent is None:
+                parent = Node(keys=[right_child.keys[0]], children=[left_child, right_child], is_leaf=False)
+                if not node.is_leaf:
+                    right_child.keys.remove(right_child.keys[0])
+                self.root = parent
+            elif parent.has_vacancy:
+                parent.keys.append(right_child.keys[0])
+                parent.children.remove(node)
+                parent.children.append(left_child)
+                parent.children.append(right_child)
+                self.evaluate_vacancy(parent)
+                if not parent.has_vacancy:
+                    self.split(parent)
+            if parent.has_vacancy:
                 left_child.parent = parent
                 right_child.parent = parent
+            if not node.is_leaf:
+                length = len(node.children)
+                majority = math.ceil(length/2)
+                left_child.children.extend(node.children[0:majority])
+                for child in left_child.children:
+                    child.parent = left_child
+                    child.children = [] #weird fix
+                right_child.children = [] #fix for weirdness of being linked to left_child.children
+                right_child.children.extend(node.children[majority:length])
+                for child in right_child.children:
+                    child.parent = right_child
+                    child.children = [] #weird fix
 
     def delete(self, value):
         print("delete " + value)
