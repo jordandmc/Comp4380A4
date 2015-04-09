@@ -25,7 +25,6 @@ def main():
             elif op.upper() == "PRINT":
                 tree.print_tree()
 
-
 def parse_input(file_name):
     with open(file_name) as input_file:
         instructions = input_file.readlines()
@@ -56,12 +55,12 @@ class BPlusTree:
         elif node.is_leaf:
             return node  # Found the leaf node the value could be in, return this node
         else:
-            for index, key in node.keys:
+            for index, key in enumerate(node.keys):
                 if value < key:
-                    return recursive_search(self, node.children[index], value)  # Search left
+                    return self.recursive_search(node.children[index], value)  # Search left
 
             # Bigger than every key in index, Go down the far right
-            return recursive_search(self, node.children[len(node.children)-1], value)
+            return self.recursive_search(node.children[len(node.children)-1], value)
 
     def insert(self, value):
         print("insert " + value)
@@ -78,10 +77,111 @@ class BPlusTree:
         print("split")
 
     def delete(self, value):
-        print("delete " + value)
+        print("delete " + str(value))
+
+        node = self.search(value)
+        self.delete_recursive(node, value)
+
+
+    def delete_recursive(self, node, value):
+        if node is None:
+            return        
+        if value in node.keys:
+            node.keys.remove(value)
+        if node.parent is None:
+            return
+        if len(node.keys) >= self.degree:
+            return
+
+        self.borrow(node)
+        self.merge(node)
+
+    def borrow(self, node):
+        parent = node.parent
+                    
+        node_position = parent.children.index(node)
+
+        if node_position > 0:
+            left_sibling = parent.children[node_position - 1]
+
+            if len(left_sibling.keys) > self.degree:
+                if node.is_leaf:
+                    transfered_key = left_sibling.keys.pop() #highest value in left sibling
+                    node.keys.insert(0, transfered_key)
+                    parent.keys[node_position - 1] = transfered_key #fix parent's key                
+                else:
+                    left_to_parent_key = left_sibling.keys.pop()
+                    parent_to_node_key = parent.keys.pop()
+                    left_to_node_child = left_sibling.children.pop()
+                    
+                    parent.keys.insert(node_position - 1, left_to_parent_key)
+                    node.keys.insert(0, parent_to_node_key)
+                    node.children.insert(0, left_to_node_child)
+                return
+                
+
+        if node_position < len(parent.children) - 1:
+            right_sibling = parent.children[node_position + 1]
+
+            if len(right_sibling.keys) > self.degree:
+                if node.is_leaf:
+                    transfered_key = right_sibling.keys.pop(0)
+                    node.keys.append(transfered_key)
+                    parent.keys[node_position] = right_sibling.keys[0]
+                else:
+                    right_to_parent_key = right_sibling.keys.pop(0)
+                    parent_to_node_key = parent.keys.pop(0)
+                    right_to_node_child = right_sibling.children.pop(0)
+
+                    parent.keys.insert(node_position, right_to_parent_key)
+                    node.keys.append(parent_to_node_key)
+                    node.children.append(right_to_node_child)    
+                return        
+
+    def merge(self, node):
+        parent = node.parent
+        node_position = parent.children.index(node)
+        if len(node.keys) >= self.degree:
+            return
+        if node_position > 0:
+            print("reached merge")
+            left_sibling = parent.children[node_position - 1]
+            node.keys.extend(left_sibling.keys)
+            if not node.is_leaf:
+                node.keys.append(parent.keys[node_position - 1])
+                left_sibling.children.extend(node.children) #puts children in correct order
+                node.children = left_sibling.children
+                for child in node.children:
+                    child.parent = node
+
+            node.keys.sort()
+        
+            if parent is self.root and len(parent.keys) == 1:
+                self.root = node
+                return
+
+            parent.children.remove(left_sibling)
+            self.delete_recursive(parent, parent.keys[node_position - 1])
+            return
+
+        if node_position < len(parent.children) - 1:
+            print("reached merge")
+            right_sibling = parent.children[node_position + 1]
+            node.keys.extend(right_sibling.keys)
+            if not node.is_leaf:
+                node.keys.append(parent.keys[node_position])
+                node.children.extend(right_sibling.children)
+                for child in node.children:
+                    child.parent = node
+            
+            node.keys.sort()
 
     def merge(self):
-        print("merge")
+                self.root = node
+
+            parent.children.remove(right_sibling)
+            self.delete_recursive(parent, parent.keys[node_position])
+            return
 
     def print_tree(self):
         print("B+tree #" + str(self.print_num) + " with order d=" + str(self.degree))
@@ -100,13 +200,14 @@ class BPlusTree:
             queue_entry = queue.popleft()
             node, node_height = queue_entry[0], queue_entry[1]
             if height != node_height:
-                print("\n")
+                tree_string += "\n"
                 height += 1
 
             if node is not None:
+                
                 tree_string += "["
                 for key in node.keys:
-                    tree_string += " " + key
+                    tree_string += " " + str(key)
                     if node.is_leaf:
                         tree_string += "*"
                 tree_string += " ]  "
@@ -115,6 +216,7 @@ class BPlusTree:
                     queue.append([child, height + 1])
 
         print(tree_string)
+
 
 if __name__ == '__main__':
     main()
