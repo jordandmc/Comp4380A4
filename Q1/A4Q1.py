@@ -176,8 +176,9 @@ class BPlusTree:
             
             node.keys.sort()
 
-    def merge(self):
+            if parent is self.root and len(parent.keys) == 1:
                 self.root = node
+                return
 
             parent.children.remove(right_sibling)
             self.delete_recursive(parent, parent.keys[node_position])
