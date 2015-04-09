@@ -26,8 +26,8 @@ def main():
                 print()
             elif op.upper() == "DELETE":
                 tree.delete(int(value))
-            #elif op.upper() == "PRINT":
-                #tree.print_tree()
+            elif op.upper() == "PRINT":
+                tree.print_tree()
 
 def parse_input(file_name):
     with open(file_name) as input_file:
@@ -96,9 +96,15 @@ class BPlusTree:
             self.root = parent
         elif parent.has_vacancy:
             parent.keys.append(right_child.keys[0])
+            
+
+            position_of_node = parent.children.index(node)
             parent.children.remove(node)
-            parent.children.append(left_child)
-            parent.children.append(right_child)
+
+            parent.children.insert(position_of_node, left_child)
+            parent.children.insert(position_of_node + 1, right_child)
+            parent.keys.sort()
+
             self.evaluate_vacancy(parent)
 
             if not node.is_leaf:
